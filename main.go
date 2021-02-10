@@ -12,14 +12,14 @@ import (
 
 func main()  {
 	l := log.New(os.Stdout, "go-around ", log.LstdFlags)
-	hh := handlers.NewHello(l)
-	bye := handlers.NewGoodbye(l)
+	//hh := handlers.NewHello(l)
+	//bye := handlers.NewGoodbye(l)
 	pl := handlers.NewProduct(l)
 
 	mux := http.NewServeMux()
-	mux.Handle("/", hh)
-	mux.Handle("/bye", bye)
-	mux.Handle("/pl", pl)
+	mux.Handle("/", pl)
+	//mux.Handle("/bye", bye)
+	//mux.Handle("/pl", pl)
 
 	s := &http.Server{
 		Addr:         ":9090",

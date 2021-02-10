@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"time"
 )
@@ -23,7 +24,41 @@ func GetStaticProducts() Products {
 	return productList
 }
 
-func (p *Products) ToJson(w io.Writer) error {
+func UpdateProduct(id int, p * Product) error {
+	fp, i, err := findProduct(id)
+	if err != nil {
+		return err
+	}
+	p.Id = fp.Id
+	productList[i] = p
+	return nil
+}
+
+func findProduct(id int) (*Product, int,  error) {
+	for i, prod := range productList {
+		if prod.Id == id {
+			return prod, i, nil
+		}
+	}
+	return nil, -1, fmt.Errorf("product with id : %v not found", id)
+}
+
+func AddProduct(p *Product)  {
+	p.Id = getNextId()
+	productList = append(productList, p)
+}
+
+func getNextId() int {
+	lp := productList[len(productList) -1]
+	return lp.Id + 1
+}
+
+func (p *Product) FromJSON(r io.Reader) error {
+	e := json.NewDecoder(r)
+	return e.Decode(p)
+}
+
+func (p *Products) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(p)
 }
