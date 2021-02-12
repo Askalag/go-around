@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/Askalag/go-around/handlers"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
@@ -14,16 +15,28 @@ func main()  {
 	l := log.New(os.Stdout, "go-around ", log.LstdFlags)
 	//hh := handlers.NewHello(l)
 	//bye := handlers.NewGoodbye(l)
-	pl := handlers.NewProduct(l)
+	p := handlers.NewProduct(l)
 
-	mux := http.NewServeMux()
-	mux.Handle("/", pl)
+	sm := mux.NewRouter()
+
+	getRouter := sm.Methods("GET").Subrouter()
+	getRouter.HandleFunc("/", p.GetProducts)
+
+	putRouter := sm.Methods("PUT").Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", p.UpdateProduct)
+	putRouter.Use(p.MiddlewareProductValidation)
+
+	postRouter := sm.Methods("POST").Subrouter()
+	postRouter.HandleFunc("/", p.AddProduct)
+	postRouter.Use(p.MiddlewareProductValidation)
+
+	//sm.Handle("/products", p)
 	//mux.Handle("/bye", bye)
 	//mux.Handle("/pl", pl)
 
 	s := &http.Server{
 		Addr:         ":9090",
-		Handler:      mux,
+		Handler:      sm,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,

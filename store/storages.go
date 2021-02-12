@@ -24,7 +24,7 @@ func GetStaticProducts() Products {
 	return productList
 }
 
-func UpdateProduct(id int, p * Product) error {
+func UpdateProduct(id int, p *Product) error {
 	fp, i, err := findProduct(id)
 	if err != nil {
 		return err
