@@ -38,6 +38,14 @@ func ValidateSKU(fl validator.FieldLevel) bool {
 	return true
 }
 
+// A list of products returns in the response
+// swagger:response productResponse
+type productResponse struct {
+	// All Products in the system
+	// in: body
+	Body []Product
+}
+
 type Products []*Product
 
 func GetStaticProducts() Products {

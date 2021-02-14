@@ -1,3 +1,17 @@
+// Package classification of Product API
+//
+// Documentation for Product API
+//
+// Schemes: http
+// BasePath: /
+// Version: 1.0.0
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+// swagger:meta
 package handlers
 
 import (
@@ -40,6 +54,12 @@ func (p *Products) AddProduct(rw http.ResponseWriter, r *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 }
 
+// swagger:route GET /products products listProducts
+// Returns a list of products
+// responses:
+// 200: productResponse
+
+// GetProducts returns the products from the static data
 func (p *Products) GetProducts(rw http.ResponseWriter, r *http.Request)  {
 	lp := store.GetStaticProducts()
 	//rw.Header().Add("Content-Type", "application/json")
@@ -55,10 +75,19 @@ func (p Products) MiddlewareProductValidation(next http.Handler) http.Handler {
 	return http.HandlerFunc(func (rw http.ResponseWriter, r *http.Request) {
 		prod := &store.Product{}
 		err := prod.FromJSON(r.Body)
+
 		if err != nil {
 			http.Error(rw, "Unable to marshal json", http.StatusBadRequest)
 			return
 		}
+
+		err2 := prod.Validate()
+
+		if err2 != nil {
+			http.Error(rw, "Bad Values for Product", http.StatusBadRequest)
+			return
+		}
+
 		ctx := context.WithValue(r.Context(), KeyProduct{}, prod)
 		req := r.WithContext(ctx)
 

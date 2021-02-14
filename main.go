@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/Askalag/go-around/handlers"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -29,6 +30,13 @@ func main()  {
 	postRouter := sm.Methods("POST").Subrouter()
 	postRouter.HandleFunc("/", p.AddProduct)
 	postRouter.Use(p.MiddlewareProductValidation)
+
+	// swagger config
+	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	getRouter.Handle("/docs", sh)
+	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	//sm.Handle("/products", p)
 	//mux.Handle("/bye", bye)
