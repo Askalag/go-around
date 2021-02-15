@@ -8,7 +8,9 @@ definitions:
         type: string
         x-go-name: Description
       id:
+        description: the id for product
         format: int64
+        minimum: 1
         type: integer
         x-go-name: Id
       name:
@@ -21,8 +23,10 @@ definitions:
       sku:
         type: string
         x-go-name: SKU
+    required:
+    - id
     type: object
-    x-go-package: github.com/Askalag/go-around/store
+    x-go-package: _/mnt/f/projects/go/go-around/store
 info:
   description: Documentation for Product API
   title: of Product API
@@ -35,6 +39,14 @@ paths:
       responses:
         "200":
           $ref: '#/responses/productResponse'
+      tags:
+      - products
+    post:
+      description: adding another product
+      operationId: product
+      responses:
+        "201":
+          description: ""
       tags:
       - products
 produces:

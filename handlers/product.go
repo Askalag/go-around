@@ -47,6 +47,12 @@ func (p *Products) UpdateProduct(rw http.ResponseWriter, r *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 }
 
+// swagger:route POST /products products product
+// adding another product
+// responses:
+// 201:
+
+// Add a new product
 func (p *Products) AddProduct(rw http.ResponseWriter, r *http.Request) {
 	p.l.Println("Handle POST add product request")
 	prod := r.Context().Value(KeyProduct{}).(*store.Product)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/Askalag/go-around/handlers"
 	"github.com/go-openapi/runtime/middleware"
+	gHandlers "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -31,20 +32,29 @@ func main()  {
 	postRouter.HandleFunc("/", p.AddProduct)
 	postRouter.Use(p.MiddlewareProductValidation)
 
-	// swagger config
+	// ReDoc config
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := middleware.Redoc(opts, nil)
 
 	getRouter.Handle("/docs", sh)
-	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+ 	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
 
 	//sm.Handle("/products", p)
 	//mux.Handle("/bye", bye)
 	//mux.Handle("/pl", pl)
 
+
+	// gzip
+	gh := gHandlers.CompressHandler(sm)
+
+	// CORS for angular
+	ch := gHandlers.CORS(gHandlers.AllowedOrigins([]string{"http://localhost:4200"}))
+	ch(gh)
+
 	s := &http.Server{
 		Addr:         ":9090",
-		Handler:      sm,
+		Handler:      ch(gh),
+		ErrorLog:     l,
 		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
