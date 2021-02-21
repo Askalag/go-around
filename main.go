@@ -17,35 +17,32 @@ func main()  {
 	l := log.New(os.Stdout, "go-around ", log.LstdFlags)
 	//hh := handlers.NewHello(l)
 	//bye := handlers.NewGoodbye(l)
-	p := handlers.NewProduct(l)
 
-	sm := mux.NewRouter()
-
-	getRouter := sm.Methods("GET").Subrouter()
-	getRouter.HandleFunc("/", p.GetProducts)
-
-	putRouter := sm.Methods("PUT").Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", p.UpdateProduct)
-	putRouter.Use(p.MiddlewareProductValidation)
-
-	postRouter := sm.Methods("POST").Subrouter()
-	postRouter.HandleFunc("/", p.AddProduct)
-	postRouter.Use(p.MiddlewareProductValidation)
-
-	// ReDoc config
+	// ReDoc and swagger config
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := middleware.Redoc(opts, nil)
 
-	getRouter.Handle("/docs", sh)
- 	getRouter.Handle("/swagger.yaml", http.FileServer(http.Dir("./")))
+	p := handlers.NewProduct(l)
+	router := mux.NewRouter()
 
-	//sm.Handle("/products", p)
+	// simple crud
+	router.HandleFunc("/", p.GetProducts).Methods("GET")
+	router.HandleFunc("/{id:[0-9]+}", p.UpdateProduct).Methods("PUT")
+	router.HandleFunc("/", p.AddProduct).Methods("POST")
+	// todo delete method
+	router.Use(p.MiddlewareProductValidation)
+
+	// swagger and reDoc
+	router.Handle("/docs", sh).Methods("GET")
+	router.Handle("/api-docs/swagger.yaml", http.FileServer(http.Dir("./"))).Methods("GET")
+
+	//router.Handle("/products", p)
 	//mux.Handle("/bye", bye)
 	//mux.Handle("/pl", pl)
 
 
 	// gzip
-	gh := gHandlers.CompressHandler(sm)
+	gh := gHandlers.CompressHandler(router)
 
 	// CORS for angular
 	ch := gHandlers.CORS(gHandlers.AllowedOrigins([]string{"http://localhost:4200"}))
@@ -77,4 +74,6 @@ func main()  {
 	l.Println("Received terminate, graceful shutdown", sig)
 	tc, _ := context.WithTimeout(context.Background(), 30 * time.Second)
 	_ = s.Shutdown(tc)
+
+
 }
