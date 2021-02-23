@@ -18,11 +18,14 @@ func main()  {
 	//hh := handlers.NewHello(l)
 	//bye := handlers.NewGoodbye(l)
 
+	const basePath = "./images"
+
 	// ReDoc and swagger config
 	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
 	sh := middleware.Redoc(opts, nil)
 
 	p := handlers.NewProduct(l)
+	//f := handlers.NewFiles(l, basePath)
 	router := mux.NewRouter()
 
 	// simple crud
@@ -31,6 +34,9 @@ func main()  {
 	router.HandleFunc("/", p.AddProduct).Methods("POST")
 	// todo delete method
 	router.Use(p.MiddlewareProductValidation)
+
+	// file
+	router.HandleFunc("/images/{id}", func (rw http.ResponseWriter, req *http.Request) {})
 
 	// swagger and reDoc
 	router.Handle("/docs", sh).Methods("GET")

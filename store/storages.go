@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+// for files
+type Storage interface {
+	Save(path string, file io.Reader) error
+}
+
 // swagger:model
 type Product struct {
 	// the id for product
