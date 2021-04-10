@@ -26,7 +26,7 @@ definitions:
     required:
     - id
     type: object
-    x-go-package: _/mnt/f/projects/go/go-around/store
+    x-go-package: _/home/askalag/project/go/go-around/store
 info:
   description: Documentation for Product API
   title: of Product API

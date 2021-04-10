@@ -19,9 +19,10 @@ func main()  {
 	//bye := handlers.NewGoodbye(l)
 
 	const basePath = "./images"
+	const swaggerFilePath = "/api-docs/swagger.yaml"
 
 	// ReDoc and swagger config
-	opts := middleware.RedocOpts{SpecURL: "/swagger.yaml"}
+	opts := middleware.RedocOpts{SpecURL: swaggerFilePath}
 	sh := middleware.Redoc(opts, nil)
 
 	p := handlers.NewProduct(l)
@@ -33,14 +34,14 @@ func main()  {
 	router.HandleFunc("/{id:[0-9]+}", p.UpdateProduct).Methods("PUT")
 	router.HandleFunc("/", p.AddProduct).Methods("POST")
 	// todo delete method
-	router.Use(p.MiddlewareProductValidation)
+	//router.Use(p.MiddlewareProductValidation)
 
 	// file
 	router.HandleFunc("/images/{id}", func (rw http.ResponseWriter, req *http.Request) {})
 
 	// swagger and reDoc
 	router.Handle("/docs", sh).Methods("GET")
-	router.Handle("/api-docs/swagger.yaml", http.FileServer(http.Dir("./"))).Methods("GET")
+	router.Handle(swaggerFilePath, http.FileServer(http.Dir("./"))).Methods("GET")
 
 	//router.Handle("/products", p)
 	//mux.Handle("/bye", bye)

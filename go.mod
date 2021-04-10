@@ -1,6 +1,6 @@
 module github.com/Askalag/go-around
 
-go 1.15
+go 1.16
 
 require (
 	github.com/go-openapi/runtime v0.19.26
